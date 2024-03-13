@@ -114,10 +114,7 @@ export class ImapSimple extends EventEmitter {
    * @param {object} fetchOptions Criteria to use to fetch the search results. Passed to node-imap's .fetch() 1:1
    * @returns {undefined|Promise} Returns a promise, resolving to `results`
    */
-  search(
-    searchCriteria: any,
-    fetchOptions: any = null,
-  ): Promise<Message[]> {
+  search(searchCriteria: any, fetchOptions: any = null): Promise<Message[]> {
     return new Promise((resolve, reject) => {
       this.imap.search(searchCriteria, (err, uids) => {
         if (err) {

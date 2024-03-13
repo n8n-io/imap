@@ -69,12 +69,6 @@ module.exports = {
         "eol-last": 2,
         yoda: [2, "never"],
         "spaced-comment": [2, "always"],
-        indent: [
-            2,
-            4,
-            {
-                SwitchCase: 1,
-            },
-        ],
+        indent: ["off"],
     },
 };
