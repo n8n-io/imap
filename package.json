@@ -2,10 +2,13 @@
   "name": "@n8n/imap",
   "version": "6.0.0",
   "description": "Wrapper over node-imap, providing a simpler api for common use cases",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "test": "mocha",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "mocha -r ts-node/register test/**/*.spec.js",
     "lint": "eslint .",
+    "format": "prettier --write src test",
     "cover": "nyc --report html mocha"
   },
   "keywords": [
@@ -49,14 +52,22 @@
     "uuencode": "0.0.4"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.12",
+    "@types/imap": "^0.8.40",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^18.19.24",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
     "chai": "^4.4.1",
     "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
+    "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "hoodiecrow-imap": "^2.1.0",
     "mocha": "^10.3.0",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
   }
 }

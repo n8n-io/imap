@@ -1,107 +1,80 @@
 module.exports = {
     env: {
         browser: true,
-        commonjs: true,
-        es2021: true
+        es2021: true,
     },
-    'extends': 'standard',
+    extends: "standard-with-typescript",
     overrides: [
         {
             env: {
-                node: true
+                node: true,
             },
-            files: [
-                '.eslintrc.js'
-            ],
+            files: [".eslintrc.js"],
             parserOptions: {
-                sourceType: 'script'
-            }
-        }
+                sourceType: "script",
+            },
+        },
     ],
     parserOptions: {
-        ecmaVersion: 'latest'
+        ecmaVersion: "latest",
+        sourceType: "module",
     },
     rules: {
-        curly: [
-            2,
-            'all'
-        ],
-        'keyword-spacing': [
-            2,
-            {}
-        ],
-        'no-with': 2,
-        'space-before-blocks': [
-            2,
-            'always'
-        ],
-        'space-before-function-paren': [
+        curly: [2, "all"],
+        "keyword-spacing": [2, {}],
+        "no-with": 2,
+        "space-before-blocks": [2, "always"],
+        "space-before-function-paren": [
             2,
             {
-                anonymous: 'ignore',
-                named: 'never'
-            }
+                anonymous: "ignore",
+                named: "never",
+            },
         ],
-        'one-var': [
+        "one-var": [2, "never"],
+        "no-multiple-empty-lines": 2,
+        "array-bracket-spacing": [
             2,
-            'never'
-        ],
-        'no-multiple-empty-lines': 2,
-        'array-bracket-spacing': [
-            2,
-            'always',
+            "always",
             {
-                objectsInArrays: false
-            }
+                objectsInArrays: false,
+            },
         ],
-        'quote-props': [
+        "quote-props": [
             2,
-            'as-needed',
+            "as-needed",
             {
-                keywords: true
-            }
+                keywords: true,
+            },
         ],
-        'key-spacing': [
+        "key-spacing": [
             2,
             {
                 beforeColon: false,
-                afterColon: true
-            }
+                afterColon: true,
+            },
         ],
-        'comma-style': [
-            2,
-            'last'
-        ],
-        'space-unary-ops': [
+        "comma-style": [2, "last"],
+        "space-unary-ops": [
             2,
             {
                 words: false,
-                nonwords: false
-            }
+                nonwords: false,
+            },
         ],
-        'space-infix-ops': 2,
-        'no-mixed-spaces-and-tabs': 2,
-        'no-trailing-spaces': 2,
-        'comma-dangle': [
-            2,
-            'never'
-        ],
-        'eol-last': 2,
-        yoda: [
-            2,
-            'never'
-        ],
-        'spaced-comment': [
-            2,
-            'always'
-        ],
+        "space-infix-ops": 2,
+        "no-mixed-spaces-and-tabs": 2,
+        "no-trailing-spaces": 2,
+        "comma-dangle": [2, "never"],
+        "eol-last": 2,
+        yoda: [2, "never"],
+        "spaced-comment": [2, "always"],
         indent: [
             2,
             4,
             {
-                SwitchCase: 1
-            }
-        ]
-
-    }
-}
+                SwitchCase: 1,
+            },
+        ],
+    },
+};

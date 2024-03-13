@@ -4,16 +4,30 @@ const hoodiecrow = require('hoodiecrow-imap')
 
 function startTestServer(port = 1143, debug = false) {
     const server = hoodiecrow({
-        plugins: [ 'ID', 'STARTTLS' /* , "LOGINDISABLED"*/, 'SASL-IR', 'AUTH-PLAIN', 'NAMESPACE', 'IDLE', 'ENABLE', 'CONDSTORE', 'XTOYBIRD', 'LITERALPLUS', 'UNSELECT', 'SPECIAL-USE', 'CREATE-SPECIAL-USE' ],
+        plugins: [
+            'ID',
+            'STARTTLS' /* , "LOGINDISABLED"*/,
+            'SASL-IR',
+            'AUTH-PLAIN',
+            'NAMESPACE',
+            'IDLE',
+            'ENABLE',
+            'CONDSTORE',
+            'XTOYBIRD',
+            'LITERALPLUS',
+            'UNSELECT',
+            'SPECIAL-USE',
+            'CREATE-SPECIAL-USE',
+        ],
         id: {
             name: 'hoodiecrow',
-            version: '0.1'
+            version: '0.1',
         },
 
         storage: {
-            INBOX: {}
+            INBOX: {},
         },
-        debug
+        debug,
     })
 
     return new Promise(function (resolve, reject) {
