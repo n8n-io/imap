@@ -198,7 +198,7 @@ export class ImapSimple extends EventEmitter {
           const encoding = part.encoding.toUpperCase()
 
           if (encoding === 'BASE64') {
-            resolve(new Buffer(data, 'base64'))
+            resolve(Buffer.from(data, 'base64'))
             return
           }
 
@@ -207,21 +207,21 @@ export class ImapSimple extends EventEmitter {
               part.params?.charset &&
               part.params.charset.toUpperCase() === 'UTF-8'
             ) {
-              resolve(new Buffer(utf8.decode(qp.decode(data))).toString())
+              resolve(Buffer.from(utf8.decode(qp.decode(data))).toString())
             } else {
-              resolve(new Buffer(qp.decode(data)).toString())
+              resolve(Buffer.from(qp.decode(data)).toString())
             }
             return
           }
 
           if (encoding === '7BIT') {
-            resolve(new Buffer(data).toString('ascii'))
+            resolve(Buffer.from(data).toString('ascii'))
             return
           }
 
           if (encoding === '8BIT' || encoding === 'BINARY') {
             const charset = part.params?.charset || 'utf-8'
-            resolve(iconvlite.decode(new Buffer(data), charset))
+            resolve(iconvlite.decode(Buffer.from(data), charset))
             return
           }
 
