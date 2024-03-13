@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "lint": "jscs . && jshint .",
-    "cover": "istanbul cover --report html _mocha"
+    "cover": "nyc --report html mocha"
   },
   "keywords": [
     "imap",
@@ -51,9 +51,9 @@
   "devDependencies": {
     "hoodiecrow-imap": "^2.1.0",
     "chai": "^3.5.0",
-    "istanbul": "^0.4.5",
     "jscs": "^3.0.7",
     "jshint": "^2.9.3",
-    "mocha": "^3.1.0"
+    "mocha": "^3.1.0",
+    "nyc": "^15.1.0"
   }
 }
