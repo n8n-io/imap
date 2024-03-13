@@ -34,6 +34,15 @@ devDependencies:
   '@types/node':
     specifier: ^18.19.24
     version: 18.19.24
+  '@types/quoted-printable':
+    specifier: ^1.0.2
+    version: 1.0.2
+  '@types/utf8':
+    specifier: ^3.0.3
+    version: 3.0.3
+  '@types/uuencode':
+    specifier: ^0.0.3
+    version: 0.0.3
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.4.0
     version: 6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.4.2)
@@ -462,8 +471,22 @@ packages:
       undici-types: 5.26.5
     dev: true
 
+  /@types/quoted-printable@1.0.2:
+    resolution: {integrity: sha512-3B28oB1rRaZNb3N5dlxysm8lH1ujzvReDuYBiIO4jvpTIg9ksrILCNgPxSGVyTWE/qwuxzgHaVehwMK3CVqAtA==}
+    dev: true
+
   /@types/semver@7.5.8:
     resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
+    dev: true
+
+  /@types/utf8@3.0.3:
+    resolution: {integrity: sha512-+lqLGxWZsEe4Z6OrzBI7Ym4SMUTaMS5yOrHZ0/IL0bpIye1Qbs4PpobJL2mLDbftUXlPFZR7fu6d1yM+bHLX1w==}
+    dev: true
+
+  /@types/uuencode@0.0.3:
+    resolution: {integrity: sha512-NaBWHPPQvcXqiSaMAGa2Ea/XaFcK/nHwGe2akwJBXRLkCNa2+izx/F1aKJrzFH+L68D88VLYIATTYP7B2k4zVA==}
+    dependencies:
+      '@types/node': 18.19.24
     dev: true
 
   /@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)(typescript@5.4.2):
