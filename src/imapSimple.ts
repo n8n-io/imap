@@ -1,5 +1,4 @@
 import Imap, { type ImapMessage } from 'imap'
-import * as nodeify from 'nodeify'
 import { EventEmitter } from 'events'
 import * as qp from 'quoted-printable'
 import * as iconvlite from 'iconv-lite'
@@ -70,15 +69,9 @@ export class ImapSimple extends EventEmitter {
    * Open a mailbox
    *
    * @param {string} boxName The name of the box to open
-   * @param {function} [callback] Optional callback, receiving signature (err, boxName)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `boxName`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  openBox(boxName: string, callback?: Function) {
-    if (callback) {
-      return nodeify(this.openBox(boxName), callback)
-    }
-
+  openBox(boxName: string) {
     return new Promise((resolve, reject) => {
       this.imap.openBox(boxName, (err, result) => {
         err ? reject(err) : resolve(result)
@@ -90,20 +83,9 @@ export class ImapSimple extends EventEmitter {
    * Close a mailbox
    *
    * @param {boolean} [autoExpunge=true] If autoExpunge is true, any messages marked as Deleted in the currently open mailbox will be remove
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `boxName`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  closeBox(autoExpunge = true, callback?: Function) {
-    if (typeof autoExpunge === 'function') {
-      callback = autoExpunge
-      autoExpunge = true
-    }
-
-    if (callback) {
-      return nodeify(this.closeBox(autoExpunge), callback)
-    }
-
+  closeBox(autoExpunge = true) {
     return new Promise<void>((resolve, reject) => {
       this.imap.closeBox(autoExpunge, (err) => {
         if (err) {
@@ -130,24 +112,12 @@ export class ImapSimple extends EventEmitter {
    *
    * @param {object} searchCriteria Criteria to use to search. Passed to node-imap's .search() 1:1
    * @param {object} fetchOptions Criteria to use to fetch the search results. Passed to node-imap's .fetch() 1:1
-   * @param {function} [callback] Optional callback, receiving signature (err, results)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `results`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `results`
    */
   search(
     searchCriteria: any,
-    fetchOptions: any,
-    callback?: Function,
+    fetchOptions: any = null,
   ): Promise<Message[]> {
-    if (!callback && typeof fetchOptions === 'function') {
-      callback = fetchOptions
-      fetchOptions = null
-    }
-
-    if (callback) {
-      return nodeify(this.search(searchCriteria, fetchOptions), callback)
-    }
-
     return new Promise((resolve, reject) => {
       this.imap.search(searchCriteria, (err, uids) => {
         if (err) {
@@ -165,7 +135,7 @@ export class ImapSimple extends EventEmitter {
         const messages: Message[] = []
 
         function fetchOnMessage(message, seqNo: number) {
-          getMessage(message).then(function (message) {
+          getMessage(message).then((message) => {
             message.seqNo = seqNo
             messages[seqNo] = message
 
@@ -205,15 +175,9 @@ export class ImapSimple extends EventEmitter {
    *
    * @param {object} message The message returned from `search()`
    * @param {object} part The message part to be downloaded, from the `message.attributes.struct` Array
-   * @param {function} [callback] Optional callback, receiving signature (err, data)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `data`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `data`
    */
-  getPartData(message: Message, part, callback?: Function) {
-    if (callback) {
-      return nodeify(this.getPartData(message, part), callback)
-    }
-
+  getPartData(message: Message, part) {
     return new Promise((resolve, reject) => {
       const fetch = this.imap.fetch(message.attributes.uid, {
         bodies: [part.partID],
@@ -296,15 +260,9 @@ export class ImapSimple extends EventEmitter {
    * @param {string|Array} source The node-imap `MessageSource` indicating the message(s) from the current open mailbox
    *  to move.
    * @param {string} boxName The mailbox to move the message(s) to.
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  moveMessage(source: any, boxName: string, callback?: Function) {
-    if (callback) {
-      return nodeify(this.moveMessage(source, boxName), callback)
-    }
-
+  moveMessage(source: any, boxName: string) {
     return new Promise<void>((resolve, reject) => {
       this.imap.move(source, boxName, (err) => {
         if (err) {
@@ -325,15 +283,9 @@ export class ImapSimple extends EventEmitter {
    * @param {string|Array} source The node-imap `MessageSource` indicating the message(s) to add the label(s) to.
    * @param {string|Array} labels Either a single string or an array of strings indicating the labels to add to the
    *  message(s).
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  addMessageLabel(source: any, labels, callback?: Function) {
-    if (callback) {
-      return nodeify(this.addMessageLabel(source, labels), callback)
-    }
-
+  addMessageLabel(source: any, labels) {
     return new Promise<void>((resolve, reject) => {
       // @ts-expect-error
       this.imap.addLabels(source, labels, (err) => {
@@ -355,15 +307,9 @@ export class ImapSimple extends EventEmitter {
    * @param {string|Array} source The node-imap `MessageSource` indicating the message(s) to remove the label(s) from.
    * @param {string|Array} labels Either a single string or an array of strings indicating the labels to remove from the
    *  message(s).
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  removeMessageLabel(source: any, labels, callback?: Function) {
-    if (callback) {
-      return nodeify(this.removeMessageLabel(source, labels), callback)
-    }
-
+  removeMessageLabel(source: any, labels) {
     return new Promise<void>((resolve, reject) => {
       // @ts-expect-error
       this.imap.delLabels(source, labels, (err) => {
@@ -383,15 +329,9 @@ export class ImapSimple extends EventEmitter {
    * @param {string|Array} uid The messages uid
    * @param {string|Array} flags Either a single string or an array of strings indicating the flags to add to the
    *  message(s).
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  addFlags(uid, flags, callback?: Function) {
-    if (callback) {
-      return nodeify(this.addFlags(uid, flags), callback)
-    }
-
+  addFlags(uid, flags) {
     return new Promise<void>((resolve, reject) => {
       this.imap.addFlags(uid, flags, (err) => {
         if (err) {
@@ -409,22 +349,15 @@ export class ImapSimple extends EventEmitter {
    * @param {string|Array} uid The messages uid
    * @param {string|Array} flags Either a single string or an array of strings indicating the flags to remove from the
    *  message(s).
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  delFlags(uid, flags, callback?: Function) {
-    if (callback) {
-      return nodeify(this.delFlags(uid, flags), callback)
-    }
-
+  delFlags(uid, flags) {
     return new Promise<void>((resolve, reject) => {
       this.imap.delFlags(uid, flags, (err) => {
         if (err) {
           reject(err)
           return
         }
-
         resolve()
       })
     })
@@ -434,15 +367,9 @@ export class ImapSimple extends EventEmitter {
    * Deletes the specified message(s).
    *
    * @param {string|Array} uid The uid or array of uids indicating the messages to be deleted
-   * @param {function} [callback] Optional callback, receiving signature (err)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
    */
-  deleteMessage(uid, callback?: Function) {
-    if (callback) {
-      return nodeify(this.deleteMessage(uid), callback)
-    }
-
+  deleteMessage(uid) {
     return new Promise<void>((resolve, reject) => {
       this.imap.addFlags(uid, '\\Deleted', (err) => {
         if (err) {
@@ -470,15 +397,9 @@ export class ImapSimple extends EventEmitter {
     * @param {string|Array<String>} [options.flag] A single flag (e.g. 'Seen') or an array
     of flags (e.g. ['Seen', 'Flagged']) to append to the message. Defaults to
     no flags.
-    * @param {function} [callback] Optional callback, receiving signature (err)
-    * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving when the action succeeds.
-    * @memberof ImapSimple
-    */
-  append(message, options, callback?: Function) {
-    if (callback) {
-      return nodeify(this.append(message, options), callback)
-    }
-
+    * @returns {undefined|Promise} Returns a promise, resolving when the action succeeds.
+     */
+  append(message, options) {
     return new Promise<void>((resolve, reject) => {
       this.imap.append(message, options, (err) => {
         if (err) {
@@ -494,18 +415,13 @@ export class ImapSimple extends EventEmitter {
   /**
    * Returns a list of mailboxes (folders).
    *
-   * @param {function} [callback] Optional callback containing 'boxes' object.
-   * @returns {undefined|Promise} Returns a promise when no callback is specified,
+   * @returns {undefined|Promise} Returns a promise,
    *  resolving when the action succeeds.
    */
 
-  getBoxes(callback?: Function) {
-    if (callback) {
-      return nodeify(this.getBoxes(), callback)
-    }
-
+  getBoxes() {
     return new Promise((resolve, reject) => {
-      this.imap.getBoxes(function (err, boxes) {
+      this.imap.getBoxes((err, boxes) => {
         if (err) {
           reject(err)
           return
@@ -520,15 +436,9 @@ export class ImapSimple extends EventEmitter {
    * Add new mailbox (folder)
    *
    * @param {string} boxName The name of the box to added
-   * @param {function} [callback] Optional callback, receiving signature (err, boxName)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `boxName`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  addBox(boxName, callback?: Function) {
-    if (callback) {
-      return nodeify(this.addBox(boxName), callback)
-    }
-
+  addBox(boxName: string) {
     return new Promise((resolve, reject) => {
       this.imap.addBox(boxName, (err) => {
         if (err) {
@@ -545,15 +455,9 @@ export class ImapSimple extends EventEmitter {
    * Delete mailbox (folder)
    *
    * @param {string} boxName The name of the box to deleted
-   * @param {function} [callback] Optional callback, receiving signature (err, boxName)
-   * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `boxName`
-   * @memberof ImapSimple
+   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  delBox(boxName, callback?: Function) {
-    if (callback) {
-      return nodeify(this.delBox(boxName), callback)
-    }
-
+  delBox(boxName: string) {
     return new Promise((resolve, reject) => {
       this.imap.delBox(boxName, (err) => {
         if (err) {
@@ -573,10 +477,9 @@ export class ImapSimple extends EventEmitter {
  *
  * @param {object} options
  * @param {object} options.imap Options to pass to node-imap constructor 1:1
- * @param {function} [callback] Optional callback, receiving signature (err, connection)
- * @returns {undefined|Promise} Returns a promise when no callback is specified, resolving to `connection`
+ * @returns {undefined|Promise} Returns a promise, resolving to `connection`
  */
-export function connect(options, callback?: Function) {
+export function connect(options) {
   options = options || {}
   options.imap = options.imap || {}
 
@@ -593,10 +496,6 @@ export function connect(options, callback?: Function) {
   options.imap.authTimeout = options.imap.hasOwnProperty('authTimeout')
     ? options.imap.authTimeout
     : 2000
-
-  if (callback) {
-    return nodeify(connect(options), callback)
-  }
 
   return new Promise((resolve, reject) => {
     const imap = new Imap(options.imap)
