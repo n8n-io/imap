@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "lint": "jscs . && jshint .",
+    "lint": "eslint .",
     "cover": "nyc --report html mocha"
   },
   "keywords": [
@@ -49,10 +49,13 @@
     "uuencode": "0.0.4"
   },
   "devDependencies": {
-    "hoodiecrow-imap": "^2.1.0",
     "chai": "^3.5.0",
-    "jscs": "^3.0.7",
-    "jshint": "^2.9.3",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
+    "hoodiecrow-imap": "^2.1.0",
     "mocha": "^3.1.0",
     "nyc": "^15.1.0"
   }
