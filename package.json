@@ -1,5 +1,5 @@
 {
-  "name": "imap-simple",
+  "name": "@n8n/imap",
   "version": "6.0.0",
   "description": "Wrapper over node-imap, providing a simpler api for common use cases",
   "main": "index.js",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chadxz/imap-simple.git"
+    "url": "https://github.com/n8n-io/imap.git"
   },
   "engines": {
     "node": ">=18.10",
