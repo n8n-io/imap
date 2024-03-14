@@ -1,72 +1,57 @@
-import { parseHeader, type ImapMessage, type ImapMessageBodyInfo } from 'imap'
+import { parseHeader, type ImapMessage, type ImapMessageBodyInfo, type ImapMessageAttributes } from 'imap'
 
-export interface Part {
-  which: string
-  size: number
-  body: string
+export interface MessageBodyPart extends ImapMessageBodyInfo {
+  /** string type where which=='TEXT', complex Object where which=='HEADER' */
+  body: string | object
 }
+
 export interface Message {
-  attributes: any
-  parts: Array<Part>
+  attributes: ImapMessageAttributes
+  parts: Array<MessageBodyPart>
   seqNo?: number
 }
 
 /**
  * Given an 'ImapMessage' from the node-imap library, retrieves the `Message`
- *
- * @returns {Promise} a promise resolving to `message` with schema as described above
  */
 export function getMessage(
   /** an ImapMessage from the node-imap library */
   message: ImapMessage,
 ): Promise<Message> {
-  return new Promise(function (resolve) {
-    let attributes: any
-    const messageParts = []
-    const isHeader = /^HEADER/g
+  return new Promise((resolve) => {
+    let attributes: ImapMessageAttributes
+    const parts: Array<MessageBodyPart> = []
 
-    function messageOnBody(
+    const messageOnBody = (
       stream: NodeJS.ReadableStream,
       info: ImapMessageBodyInfo,
-    ) {
+    ) => {
       let body: string = ''
 
-      function streamOnData(chunk: Buffer) {
+      const streamOnData = (chunk: Buffer) => {
         body += chunk.toString('utf8')
       }
 
       stream.on('data', streamOnData)
-
-      stream.once('end', function streamOnEnd() {
+      stream.once('end', () => {
         stream.removeListener('data', streamOnData)
 
-        const part: Part = {
+        parts.push({
           which: info.which,
           size: info.size,
-          body,
-        }
-
-        if (isHeader.test(part.which)) {
-          // TODO: fix this
-          // @ts-expect-error
-          part.body = parseHeader(part.body)
-        }
-
-        messageParts.push(part)
+          body: /^HEADER/g.test(info.which) ? parseHeader(body as string) : body,
+        })
       })
     }
 
-    function messageOnAttributes(attrs) {
+    const messageOnAttributes = (attrs: ImapMessageAttributes) => {
       attributes = attrs
     }
 
-    function messageOnEnd() {
+    const messageOnEnd = () => {
       message.removeListener('body', messageOnBody)
       message.removeListener('attributes', messageOnAttributes)
-      resolve({
-        attributes,
-        parts: messageParts,
-      })
+      resolve({ attributes, parts })
     }
 
     message.on('body', messageOnBody)

@@ -30,7 +30,7 @@ export class ImapSimple extends EventEmitter {
     })
 
     // special handling for `error` event
-    this.imap.on('error', (err) => {
+    this.imap.on('error', (err: Error & { code?: string }) => {
       // if .end() has been called and an 'ECONNRESET' error is received, don't bubble
       if (err && this.ending && err.code.toUpperCase() === 'ECONNRESET') {
         return
@@ -42,7 +42,7 @@ export class ImapSimple extends EventEmitter {
   /**
    * disconnect from the imap server
    */
-  end() {
+  end(): void {
     // set state flag to suppress 'ECONNRESET' errors that are triggered when .end() is called.
     // it is a known issue that has no known fix. This just temporarily ignores that error.
     // https://github.com/mscdex/node-imap/issues/391
@@ -61,11 +61,11 @@ export class ImapSimple extends EventEmitter {
 
   /**
    * Open a mailbox
-   *
-   * @param {string} boxName The name of the box to open
-   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  openBox(boxName: string) {
+  openBox(
+    /** The name of the box to open */
+    boxName: string
+  ): Promise<Imap.Box> {
     return new Promise((resolve, reject) => {
       this.imap.openBox(boxName, (err, result) => {
         err ? reject(err) : resolve(result)
@@ -75,18 +75,14 @@ export class ImapSimple extends EventEmitter {
 
   /**
    * Close a mailbox
-   *
-   * @param {boolean} [autoExpunge=true] If autoExpunge is true, any messages marked as Deleted in the currently open mailbox will be remove
-   * @returns {undefined|Promise} Returns a promise, resolving to `boxName`
    */
-  closeBox(autoExpunge = true) {
+  closeBox(
+    /** If autoExpunge is true, any messages marked as Deleted in the currently open mailbox will be removed @default true */
+    autoExpunge = true
+  ) {
     return new Promise<void>((resolve, reject) => {
       this.imap.closeBox(autoExpunge, (err) => {
-        if (err) {
-          reject(err)
-          return
-        }
-        resolve()
+        err ? reject(err) : resolve()
       })
     })
   }
@@ -184,7 +180,7 @@ export class ImapSimple extends EventEmitter {
             return
           }
 
-          const data = result.parts[0].body
+          const data = result.parts[0].body as string
 
           const encoding = part.encoding.toUpperCase()
 
