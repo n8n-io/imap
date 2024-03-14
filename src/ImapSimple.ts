@@ -6,7 +6,6 @@ import * as utf8 from 'utf8'
 import * as uuencode from 'uuencode'
 
 import { getMessage, type Message } from './helpers/getMessage'
-import { ConnectionTimeoutError } from './errors'
 
 const IMAP_EVENTS = [
   'alert',
@@ -18,11 +17,6 @@ const IMAP_EVENTS = [
   'end',
 ] as const
 
-/**
- * Constructs an instance of ImapSimple
- *
- * @param {object} imap a constructed node-imap connection
- */
 export class ImapSimple extends EventEmitter {
   /** flag to determine whether we should suppress ECONNRESET from bubbling up to listener */
   private ending = false
@@ -466,110 +460,4 @@ export class ImapSimple extends EventEmitter {
       })
     })
   }
-}
-
-/**
- * Connect to an Imap server, returning an ImapSimple instance, which is a wrapper over node-imap to
- * simplify it's api for common use cases.
- *
- * @param {object} options
- * @param {object} options.imap Options to pass to node-imap constructor 1:1
- * @returns {undefined|Promise} Returns a promise, resolving to `connection`
- */
-export function connect(options) {
-  options = options || {}
-  options.imap = options.imap || {}
-
-  // support old connectTimeout config option. Remove in v2.0.0
-  if (options.hasOwnProperty('connectTimeout')) {
-    console.warn(
-      '[imap-simple] connect: options.connectTimeout is deprecated. ' +
-        'Please use options.imap.authTimeout instead.',
-    )
-    options.imap.authTimeout = options.connectTimeout
-  }
-
-  // set default authTimeout
-  options.imap.authTimeout = options.imap.hasOwnProperty('authTimeout')
-    ? options.imap.authTimeout
-    : 2000
-
-  return new Promise((resolve, reject) => {
-    const imap = new Imap(options.imap)
-
-    function imapOnReady() {
-      imap.removeListener('error', imapOnError)
-      imap.removeListener('close', imapOnClose)
-      imap.removeListener('end', imapOnEnd)
-      resolve(new ImapSimple(imap))
-    }
-
-    function imapOnError(err) {
-      if (err.source === 'timeout-auth') {
-        err = new ConnectionTimeoutError(options.imap.authTimeout)
-      }
-
-      imap.removeListener('ready', imapOnReady)
-      imap.removeListener('close', imapOnClose)
-      imap.removeListener('end', imapOnEnd)
-      reject(err)
-    }
-
-    function imapOnEnd() {
-      imap.removeListener('ready', imapOnReady)
-      imap.removeListener('error', imapOnError)
-      imap.removeListener('close', imapOnClose)
-      reject(new Error('Connection ended unexpectedly'))
-    }
-
-    function imapOnClose() {
-      imap.removeListener('ready', imapOnReady)
-      imap.removeListener('error', imapOnError)
-      imap.removeListener('end', imapOnEnd)
-      reject(new Error('Connection closed unexpectedly'))
-    }
-
-    imap.once('ready', imapOnReady)
-    imap.once('error', imapOnError)
-    imap.once('close', imapOnClose)
-    imap.once('end', imapOnEnd)
-
-    if (options.hasOwnProperty('onmail')) {
-      imap.on('mail', options.onmail)
-    }
-
-    if (options.hasOwnProperty('onexpunge')) {
-      imap.on('expunge', options.onexpunge)
-    }
-
-    if (options.hasOwnProperty('onupdate')) {
-      imap.on('update', options.onupdate)
-    }
-
-    imap.connect()
-  })
-}
-
-/**
- * Given the `message.attributes.struct`, retrieve a flattened array of `parts` objects that describe the structure of
- * the different parts of the message's body. Useful for getting a simple list to iterate for the purposes of,
- * for example, finding all attachments.
- *
- * Code taken from http://stackoverflow.com/questions/25247207/how-to-read-and-save-attachments-using-node-imap
- *
- * @param {Array} struct The `message.attributes.struct` value from the message you wish to retrieve parts for.
- * @param {Array} [parts] The list of parts to push to.
- * @returns {Array} a flattened array of `parts` objects that describe the structure of the different parts of the
- *  message's body
- */
-export function getParts(struct, parts) {
-  parts = parts || []
-  for (let i = 0; i < struct.length; i++) {
-    if (Array.isArray(struct[i])) {
-      getParts(struct[i], parts)
-    } else if (struct[i].partID) {
-      parts.push(struct[i])
-    }
-  }
-  return parts
 }
